@@ -67,6 +67,7 @@ int main() {
     
     int aux2;
     int aux;
+    int R, G, B;
     unsigned int mask;
 
     printf("Current value of R0: 0x%02x\n", *r0);
@@ -78,22 +79,20 @@ int main() {
         printf("Liga/Desliga o LED de operação = 7\n");
         printf("Led de status RGB = 8\n");
         printf("Define R0 para padrao de fabrica = 9\n");
+        printf("Cor do display = 10\n");
         
         scanf("%d",&aux);
         if(aux == 1){
             *r0 = *r0 ^ 0x01;
         }
 
-        
         if(aux == 2){
             //estatico
             mask = ~(0x01<<1);
             *r0 = *r0 & mask;
             mask = ~(0x01<<2);
-            *r0 = *r0 & mask;
-            
+            *r0 = *r0 & mask; 
         }
-
         if(aux == 3){
             //deslizante
             mask = (0x01<<1);
@@ -101,7 +100,6 @@ int main() {
             mask = ~(0x01<<2);
             *r0 = *r0 & mask;
         }
-        
         if(aux == 4){
             //piscante
             mask = (0x01<<2);
@@ -109,7 +107,6 @@ int main() {
             mask = ~(0x01<<1);
             *r0 = *r0 & mask;
         }
-        
         if(aux == 5){
             //deslizante e piscante
             mask = (0x01<<1);
@@ -134,7 +131,6 @@ int main() {
         if(aux == 8){
             //Liga/Desliga o LED de status e define cor:
             
-            int R, G, B;
             printf("Digite tres numeros (0 ou 1), RGB: ");
             scanf("%d %d %d", &R, &G, &B);
             mask = 0xE3FF;
@@ -158,7 +154,19 @@ int main() {
             //led de operacao
             mask = 0x11;
             *r0 = *r0 & mask;
-        }
+    }
+    if (aux ==10)
+    {
+        printf("Digite tres numeros (0 a 255), RGB: ");
+        scanf("%d %d %d", &R, &G, &B);
+        *r1 = *r1 & 0x0;
+        *r1 = *r1 | R;
+        *r1 = *r1 | (G<<8);
+        *r2 = *r2 & 0x0;
+        *r2 = *r2 | B;
+
+    }
+    
 
     }while (1);
 
