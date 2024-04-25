@@ -64,7 +64,8 @@ int main() {
     unsigned short *r1 = base_address + 0x01;
     unsigned short *r2 = base_address + 0x02;
     unsigned short *r3 = base_address + 0x03;
-
+    
+    int aux2;
     int aux;
     unsigned int mask;
 
@@ -73,6 +74,11 @@ int main() {
     do{
         printf("display on/off = 1\n");
         printf("display exib = 2,3,4,5\n");
+        printf("velocidade de exib = 6\n");
+        printf("Liga/Desliga o LED de operação = 7\n");
+        printf("Led de status RGB = 8\n");
+        printf("Define R0 para padrao de fabrica = 9\n");
+        
         scanf("%d",&aux);
         if(aux == 1){
             *r0 = *r0 ^ 0x01;
@@ -110,6 +116,47 @@ int main() {
             *r0 = *r0 | mask;
             mask = (0x01<<2);
             *r0 = *r0 | mask;
+        }
+        if(aux == 6){
+            //velocidade
+            printf("Digite a velocidade de exibicao: ");
+            scanf("%d",&aux2);
+            mask = (0xFE07);
+            *r0 = *r0 & mask;
+            mask = (aux2<<3);
+            *r0 = *r0 | mask;
+        }
+        if(aux == 7){
+            //led de operacao
+            mask = (0x01<<9);
+            *r0 = *r0 ^ mask;
+        }
+        if(aux == 8){
+            //Liga/Desliga o LED de status e define cor:
+            printf("Digite o RGB: 3 - Vermelho, 2 - Verde, 1 - Azul\n");
+            scanf("%d",&aux2);
+            if(aux2 == 1){
+                mask = 0xE3FF;
+                *r0 = *r0 & mask;
+                mask = 0x01<<10;
+            }
+            if(aux2 == 2){
+                mask = 0xE3FF;
+                *r0 = *r0 & mask;
+                mask = 0x01<<11;
+            }
+            if(aux2 == 3){
+                mask = 0xE3FF;
+                *r0 = *r0 & mask;
+                mask = 0x01<<12;
+               
+        }
+            *r0 = *r0 | mask;
+    }
+     if(aux == 9){
+            //led de operacao
+            mask = 0x11;
+            *r0 = *r0 & mask;
         }
 
     }while (1);
