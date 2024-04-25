@@ -133,25 +133,26 @@ int main() {
         }
         if(aux == 8){
             //Liga/Desliga o LED de status e define cor:
-            printf("Digite o RGB: 3 - Vermelho, 2 - Verde, 1 - Azul\n");
-            scanf("%d",&aux2);
-            if(aux2 == 1){
-                mask = 0xE3FF;
-                *r0 = *r0 & mask;
+            
+            int R, G, B;
+            printf("Digite tres numeros (0 ou 1), RGB: ");
+            scanf("%d %d %d", &R, &G, &B);
+            mask = 0xE3FF;
+            *r0 = *r0 & mask;
+
+            if(B == 1){
                 mask = 0x01<<10;
+                *r0 = *r0 | mask;
             }
-            if(aux2 == 2){
-                mask = 0xE3FF;
-                *r0 = *r0 & mask;
+            if(G == 1){
                 mask = 0x01<<11;
+                *r0 = *r0 | mask;
             }
-            if(aux2 == 3){
-                mask = 0xE3FF;
-                *r0 = *r0 & mask;
+            if(R == 1){
                 mask = 0x01<<12;
-               
-        }
-            *r0 = *r0 | mask;
+                *r0 = *r0 | mask;
+            }
+            
     }
      if(aux == 9){
             //led de operacao
