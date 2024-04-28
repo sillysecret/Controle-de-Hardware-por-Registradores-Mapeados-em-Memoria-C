@@ -4,9 +4,28 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #define FILE_PATH "registers.bin"
 #define FILE_SIZE 1024  // Same size as used in the first program
+
+void setRGB(unsigned short *r,int R,int G,int B){    
+            unsigned short mask = 0xE3FF;
+            *r = *r & mask;
+
+            if(B == 1){
+                mask = 0x01<<10;
+                *r = *r | mask;
+            }
+            if(G == 1){
+                mask = 0x01<<11;
+                *r = *r | mask;
+            }
+            if(R == 1){
+                mask = 0x01<<12;
+                *r = *r | mask;
+            }
+}
 
 // Function to open or create the file and map it into memory
 char* registers_map(const char* file_path, int file_size, int* fd) {
@@ -64,6 +83,7 @@ int main() {
     unsigned short *r1 = base_address + 0x01;
     unsigned short *r2 = base_address + 0x02;
     unsigned short *r3 = base_address + 0x03;
+    unsigned short *r4 = base_address + 0x04;
     
     int aux2;
     int aux;
@@ -72,6 +92,9 @@ int main() {
 
     printf("Current value of R0: 0x%02x\n", *r0);
     printf("Current value of R1: 0x%02x\n", *r1);
+    printf("Current value of R2: 0x%02x\n", *r2);
+    printf("Current value of R3: 0x%02x\n", *r3);
+    printf("Current value of R4: 0x%02x\n", *r4);
     do{
         printf("display on/off = 1\n");
         printf("display exib = 2,3,4,5\n");
@@ -80,7 +103,8 @@ int main() {
         printf("Led de status RGB = 8\n");
         printf("Define R0 para padrao de fabrica = 9\n");
         printf("Cor do display = 10\n");
-        
+        printf("Setar nivel de bateria = 11\n");
+        printf("Editar mensagem (apenas 24 caracteres)= 12\n");
         scanf("%d",&aux);
         if(aux == 1){
             *r0 = *r0 ^ 0x01;
@@ -130,24 +154,9 @@ int main() {
         }
         if(aux == 8){
             //Liga/Desliga o LED de status e define cor:
-            
             printf("Digite tres numeros (0 ou 1), RGB: ");
             scanf("%d %d %d", &R, &G, &B);
-            mask = 0xE3FF;
-            *r0 = *r0 & mask;
-
-            if(B == 1){
-                mask = 0x01<<10;
-                *r0 = *r0 | mask;
-            }
-            if(G == 1){
-                mask = 0x01<<11;
-                *r0 = *r0 | mask;
-            }
-            if(R == 1){
-                mask = 0x01<<12;
-                *r0 = *r0 | mask;
-            }
+            setRGB(r0,R,G,B);
             
     }
      if(aux == 9){
@@ -166,7 +175,56 @@ int main() {
         *r2 = *r2 | B;
 
     }
-    
+    if (aux ==11)
+    {
+        printf("0 = crítico,1 = baixo,2 = médio,3 = alto");
+        scanf("%d",&aux2);
+        if(aux2==0){
+            setRGB(r0,1,0,0);
+            mask = 0xFC; 
+            *r3 = *r3 & mask; 
+        }
+        if(aux2==1){
+            setRGB(r0,1,1,0);
+            mask = 0xFC; 
+            *r3 = *r3 & mask;
+            mask = 0x01;
+            *r3 = *r3 | mask;   
+        }
+        if(aux2==2){
+            setRGB(r0,0,1,0);
+            mask = 0xFC; 
+            *r3 = *r3 & mask;
+            mask = 0x01<<1;
+            *r3 = *r3 | mask;  
+        }
+        if(aux2==3){
+            setRGB(r0,0,1,0);
+            mask = 0xFC; 
+            *r3 = *r3 & mask;
+            mask = 0x01<<1;
+            *r3 = *r3 | mask;
+            mask = 0x01;
+            *r3 = *r3 | mask;   
+        }
+       
+
+    }
+    if (aux ==12)
+    {
+    char msg[25]; 
+    printf("Digite a mensagem: ");
+    fgets(msg, sizeof(msg), stdin); 
+    msg[24] = '\0'; 
+
+for (int i = 0; i < 25; i++) {
+    *((char *)r4 + i) = 0; // Limpa o byte atual, onde o ponteiro r4 é interpretado como um ponteiro para char
+}
+
+for (int i = 0; i < 24; i++) {
+    *((char *)r4 + i) = msg[i]; // Adiciona o elemento i de msg ao byte atual, onde o ponteiro r4 é interpretado como um ponteiro para char
+}
+    }
 
     }while (1);
 
